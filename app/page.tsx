@@ -4,9 +4,13 @@ import { useState, useEffect } from "react"
 import { Dashboard } from "@/components/dashboard"
 import { NoteForm } from "@/components/note-form"
 import { NoteDetail } from "@/components/note-detail"
+import { GrowthInsights } from "@/components/growth-insights"
+import { Header } from "@/components/header"
 import { Feather } from "lucide-react"
 import type { Note } from "@/lib/types"
 import { getNotes, addNote, updateNote, deleteNote } from "@/lib/storage"
+
+type ViewType = "dashboard" | "growth"
 
 export default function HomePage() {
   const [notes, setNotes] = useState<Note[]>([])
@@ -14,6 +18,7 @@ export default function HomePage() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [currentView, setCurrentView] = useState<ViewType>("dashboard")
 
   useEffect(() => {
     const storedNotes = getNotes()
@@ -30,6 +35,7 @@ export default function HomePage() {
     const updatedNotes = addNote(newNote)
     setNotes(updatedNotes)
     setIsFormOpen(false)
+    setSelectedNote(newNote)
   }
 
   const handleUpdateNote = (note: Omit<Note, "id" | "createdAt">) => {
@@ -57,6 +63,18 @@ export default function HomePage() {
     setIsFormOpen(true)
   }
 
+  const handleViewChange = (view: ViewType) => {
+    setCurrentView(view)
+    setSelectedNote(null)
+    setIsFormOpen(false)
+    setEditingNote(null)
+  }
+
+  const handleViewGrowthInsights = () => {
+    setCurrentView("growth")
+    setSelectedNote(null)
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background paper-texture flex items-center justify-center">
@@ -70,17 +88,23 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background paper-texture">
-      <header className="border-b border-border/60 bg-card/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4 flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-primary/10 border border-primary/20">
-            <Feather className="h-5 w-5 text-primary" />
-          </div>
-          <h1 className="text-xl font-semibold text-foreground tracking-wide">每日复盘</h1>
-        </div>
-      </header>
+      <Header
+        onNewNote={() => {
+          setEditingNote(null)
+          setIsFormOpen(true)
+          setCurrentView("dashboard")
+        }}
+        currentView={currentView}
+        onViewChange={handleViewChange}
+      />
 
       <main className="container mx-auto px-4 md:px-6 py-8">
-        {isFormOpen ? (
+        {currentView === "growth" ? (
+          <GrowthInsights
+            notes={notes}
+            onBack={() => setCurrentView("dashboard")}
+          />
+        ) : isFormOpen ? (
           <NoteForm
             note={editingNote}
             onSubmit={editingNote ? handleUpdateNote : handleCreateNote}
@@ -92,9 +116,11 @@ export default function HomePage() {
         ) : selectedNote ? (
           <NoteDetail
             note={selectedNote}
+            allNotes={notes}
             onBack={() => setSelectedNote(null)}
             onEdit={() => handleEditNote(selectedNote)}
             onDelete={() => handleDeleteNote(selectedNote.id)}
+            onViewGrowthInsights={handleViewGrowthInsights}
           />
         ) : (
           <Dashboard

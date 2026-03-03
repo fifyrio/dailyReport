@@ -5,15 +5,18 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Edit, Trash2, Calendar, Star, Quote, Lightbulb, Target, ListChecks, Tag } from "lucide-react"
 import type { Note } from "@/lib/types"
 import { NoteChat } from "./note-chat"
+import { GrowthQuickAdvice } from "./growth-quick-advice"
 
 interface NoteDetailProps {
   note: Note
+  allNotes: Note[]
   onBack: () => void
   onEdit: () => void
   onDelete: () => void
+  onViewGrowthInsights: () => void
 }
 
-export function NoteDetail({ note, onBack, onEdit, onDelete }: NoteDetailProps) {
+export function NoteDetail({ note, allNotes, onBack, onEdit, onDelete, onViewGrowthInsights }: NoteDetailProps) {
   return (
     <div className="max-w-3xl mx-auto">
       {/* 顶部操作栏 */}
@@ -157,6 +160,12 @@ export function NoteDetail({ note, onBack, onEdit, onDelete }: NoteDetailProps) 
       </article>
 
       <NoteChat note={note} />
+
+      <GrowthQuickAdvice
+        note={note}
+        allNotes={allNotes}
+        onViewFullInsights={onViewGrowthInsights}
+      />
     </div>
   )
 }
