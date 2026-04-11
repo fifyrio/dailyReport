@@ -86,7 +86,7 @@ ${notesText}
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5-mini",
+        model: "bytedance-seed/seed-2.0-lite",
         messages: [
           { role: "system", content: isQuick ? quickPrompt : fullPrompt },
           { role: "user", content: "请根据以上笔记记录生成成长建议分析。" },

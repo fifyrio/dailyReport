@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "openai/gpt-5-mini",
+        model: "bytedance-seed/seed-2.0-lite",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: content },
